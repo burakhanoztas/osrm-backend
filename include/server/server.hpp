@@ -5,6 +5,7 @@
 #include "server/request_handler.hpp"
 #include "server/service_handler.hpp"
 
+#include "util/available_threads.hpp"
 #include "util/log.hpp"
 
 #include <boost/asio.hpp>
@@ -37,7 +38,7 @@ class Server : public std::enable_shared_from_this<Server>
                                                 unsigned max_header_size)
     {
         util::Log() << "HTTP/1.1 server using Boost.Beast, compression by zlib " << zlibVersion();
-        const unsigned hardware_threads = std::max(1u, std::thread::hardware_concurrency());
+        const unsigned hardware_threads = util::GetAvailableThreads();
         const unsigned real_num_threads = std::min(hardware_threads, requested_num_threads);
         return std::make_shared<Server>(
             ip_address, ip_port, real_num_threads, keepalive_timeout, max_header_size);
